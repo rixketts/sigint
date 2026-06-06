@@ -137,7 +137,7 @@ def expectation_maximization_algorithm_ector(
     :type max_iters: int (default 1000)
     :param epsilon: (optional) convergence quantifier
     :type epsilon: float (default 1e-6)
-    :return: p_k, x1_k, x2_k, convergence status, p_0, histograms for x1, x1, and p, and solver time
+    :return: p_k, x1_k, x2_k, convergence status, p_0, histograms for x1, x2, and p, and solver time
     :rtype: EMRes
     """
     start_time = time.time()
