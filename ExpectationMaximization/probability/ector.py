@@ -138,7 +138,7 @@ def expectation_maximization_algorithm_ector(
     :param epsilon: (optional) convergence quantifier
     :type epsilon: float (default 1e-6)
     :return: p_k, x1_k, x2_k, and convergence status
-    :rtype: ExpectationRes (float, float, float, bool respectively)
+    :rtype: EMRes
     """
     start_time = time.time()
 
