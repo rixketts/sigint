@@ -161,6 +161,8 @@ def expectation_maximization_algorithm_ector(
         x1 = y1 * 0.25 / (0.5 + p_over_2)
         # x_2^{k+2} = E[x_1|y_1,p^{k}]
         x2 = y1 * (0.25 + p_over_2) / (0.5 + p_over_2)
+
+        # --- Maximization Step (M-step) ---
         # p^[k+1] = (2x_2^{k+1} - x_3) / (x_2^{k+1} + x_3)
         p = (2.0 * x2 - x3) / (x2 + x3)
 
