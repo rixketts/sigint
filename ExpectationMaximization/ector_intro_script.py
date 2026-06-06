@@ -1,5 +1,6 @@
 from probability.ector import (
-    trinomial_probability_det_objs, feature_extractor, p_ml_argmax_prob_fn
+    trinomial_probability_det_objs, feature_extractor, p_ml_argmax_prob_fn,
+    expectation_maximization_algorithm_ector
 )
 from utils.validate import validate_x_vector, validate_p_param
 from utils.results import ArgmaxG
@@ -106,6 +107,9 @@ def main() -> None:
     prob_binom, percent_diff_binom = feature_extractor_pipeline(y1, y2, p, prob_trinom)
 
     ml_p_from_g, percent_diff_ml_p_g = p_ml_from_g_pipeline(y1, y2, user_p=p)
+
+    em_res = expectation_maximization_algorithm_ector(y1, x[2], p)
+    print("\n", em_res)
 
 
 if __name__ == "__main__":
