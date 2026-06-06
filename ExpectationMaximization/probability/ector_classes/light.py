@@ -5,11 +5,11 @@ class LightObject:
     """
     def __init__(self) -> None:
         self.base_prob = 0.5
-        self.p_coefficient = -0.25
+        self.p_coef = -0.25
     
 
-    def get_probability_light(self, p: float) -> float:
+    def get_probability(self, p: float) -> float:
         """
         Compute 1/2 - p/4
         """
-        return self.base_prob + p * self.p_coefficient
+        return self.base_prob + p * self.p_coef

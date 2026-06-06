@@ -1,4 +1,5 @@
-from probability.ector import trinomial_probability_det_objs
+from probability.ector import trinomial_probability_det_objs, feature_extractor
+from utils.validate import validate_x_vector, validate_p_param
 
 import sys
 
@@ -15,15 +16,26 @@ def print_usage(
 def main() -> None:
     print_usage()
 
-    x1 = int(sys.argv[1])
-    x2 = int(sys.argv[2])
-    x3 = int(sys.argv[3])
-
+    x = (
+        int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
+    )
     p = float(sys.argv[4])
 
-    prob = trinomial_probability_det_objs(x=(x1, x2, x3), p=p)
+    validate_x_vector(x); validate_p_param(p)
 
-    print(f"\nProbability of finding {x1} dark round objs, {x2} dark square objs, {x3} light objs: {prob:.6f}")
+    prob_trinom = trinomial_probability_det_objs(x, p)
+    print(
+        f"\nTrinom. probability of finding {x[0]} dark round objs,"
+        f"{x[1]} dark square objs, {x[2]} light objs: {prob_trinom:.6f}"
+    )
+
+    prob_binom = feature_extractor(x, p)
+    print(
+        f"\nBinom. probability of finding {x[0]} dark round objs,"
+        f"{x[1]} dark square objs, {x[2]} light objs: {prob_binom:.6f}"
+    )
+
+    print(f"\nDifference b/w trinom. and binom.: {abs(prob_trinom - prob_binom):.6f}")
 
 
 if __name__ == "__main__":
