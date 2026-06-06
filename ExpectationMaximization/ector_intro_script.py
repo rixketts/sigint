@@ -7,10 +7,9 @@ from utils.results import ArgmaxG
 import sys
 
 
-def print_usage(
-    usage: str = "python ector_intro_script.py x1 x2 x3 p"
-) -> None:
+def print_usage() -> None:
     if len(sys.argv) != 5:
+        usage = "python ector_intro_script.py x1 x2 x3 p"
         print("Usage:", usage)
 
         sys.exit(0)
