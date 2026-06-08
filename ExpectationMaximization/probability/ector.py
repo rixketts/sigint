@@ -7,8 +7,9 @@ from scipy.optimize import minimize_scalar
 
 from probability.ector_classes.dark import SquareObject, RoundObject, DarkObject
 from probability.ector_classes.light import LightObject
-from utils.validate import validate_x_vector, validate_p_param
-from utils.results import ArgmaxG, EMRes
+from utils.results import ArgmaxG, EMRes, EMResOneStep
+from utils.convergence import convergence
+from utils.getters import get_final_two_values
 
 DARK_OBJ = DarkObject()
 DARK_SQUARE_OBJ = SquareObject()
@@ -127,10 +128,10 @@ def expectation_maximization_algorithm_ector(
     (x3 is already known, so don't compute it here), where k = 1, 2, ..., max_iters.
     Repeat until max_iters is reached or the solver converges, whichever comes first
 
-    :param x3: number of total light counts
-    :type x3: nonneg float or int
     :param y1: number of total dark counts
     :type y1: nonneg float or int
+    :param x3: number of total light counts
+    :type x3: nonneg float or int
     :param p_0: warmstart guess for finding p_k
     :type p_0: float
     :param max_iters: (optional) maximum iterations
@@ -141,8 +142,6 @@ def expectation_maximization_algorithm_ector(
     :rtype: EMRes
     """
     start_time = time.time()
-
-    convergence = lambda last_val, second_to_last_val: abs(last_val - second_to_last_val) <= epsilon
 
     p_history: dict[str, float] = {}
     p_history["p_0"] = p_0
@@ -175,9 +174,9 @@ def expectation_maximization_algorithm_ector(
             prev_x2 = x2_history[f"x2_{iters - 1}"]
             prev_p = p_history[f"p_{iters - 1}"]
 
-            x1_converged = bool(convergence(x1, prev_x1))
-            x2_converged = bool(convergence(x2, prev_x2))
-            p_converged = bool(convergence(p, prev_p))
+            x1_converged = convergence(x1, prev_x1, epsilon)
+            x2_converged = convergence(x2, prev_x2, epsilon)
+            p_converged = convergence(p, prev_p, epsilon)
 
             if x1_converged and x2_converged and p_converged:
                 converged = True
@@ -190,23 +189,13 @@ def expectation_maximization_algorithm_ector(
         
         iters += 1
 
-        
-    def _get_final_two_values(history: dict[str, float]) -> tuple[float, float]:
-        """
-        Get final two values from a histogram in the case that the while loop completes
-        """
-        values = list(history.values())
-        
-        return (values[-1], values[-2])
-        
+    last_x1, second_to_last_x1 = get_final_two_values(x1_history)
+    last_x2, second_to_last_x2 = get_final_two_values(x2_history)
+    last_p, second_to_last_p = get_final_two_values(p_history)
 
-    last_x1, second_to_last_x1 = _get_final_two_values(x1_history)
-    last_x2, second_to_last_x2 = _get_final_two_values(x2_history)
-    last_p, second_to_last_p = _get_final_two_values(p_history)
-
-    x1_converged = bool(convergence(last_x1, second_to_last_x1))
-    x2_converged = bool(convergence(last_x2, second_to_last_x2))
-    p_converged = bool(convergence(last_p, second_to_last_p))
+    x1_converged = convergence(last_x1, second_to_last_x1, epsilon)
+    x2_converged = convergence(last_x2, second_to_last_x2, epsilon)
+    p_converged = convergence(last_p, second_to_last_p, epsilon)
 
     if x1_converged and x2_converged and p_converged:
         converged = True
@@ -216,3 +205,27 @@ def expectation_maximization_algorithm_ector(
         p_0=p_0, p_history=p_history, x1_history=x1_history,
         x2_history=x2_history, solver_time=time.time() - start_time
     )
+
+
+def compute_p_k_plus_1(
+    p_k: float,
+    y1: float | int,
+    x3: float | int
+) -> float:
+    """
+    Less computationally expensive alternative to compute p^[k+1]
+    at the trade-off of not knowing x2
+
+    :param p_k: p for use w/ current iteration
+    :type p_k: float
+    :param y1: number of total dark counts
+    :type y1: nonneg float or int
+    :param x3: number of total light counts
+    :type x3: nonneg float or int
+    :return: p for next iteration
+    :rtype: float
+    """
+    num = p_k * (4.0 * y1 - 2.0 * x3) + 2.0 * y1 - 2.0 * x3
+    denom = p_k * (2.0 * y1 + 2.0 * x3) + y1 + 2.0 * x3
+
+    return num / denom

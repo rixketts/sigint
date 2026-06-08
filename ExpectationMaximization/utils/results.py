@@ -25,3 +25,16 @@ class EMRes:
     x1_history: dict[str, float]
     x2_history: dict[str, float]
     solver_time: float
+
+
+@dataclass
+class EMResOneStep:
+    """
+    Results from a less computationally expensive rendition
+    of Expectation Maximization Algorithm
+    """
+    p_k: float
+    converged: bool
+    p_0: float
+    p_history: dict[str, float]
+    solver_time: float
