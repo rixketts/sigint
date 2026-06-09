@@ -1,6 +1,6 @@
 from probability.ector import (
     trinomial_probability_det_objs, feature_extractor, p_ml_argmax_prob_fn,
-    expectation_maximization_algorithm_ector
+    expectation_maximization_algorithm_ector, em_algorithm_ector_one_step
 )
 from utils.validate import validate_x_vector, validate_p_param
 from utils.results import ArgmaxG
@@ -109,7 +109,10 @@ def main() -> None:
     ml_p_from_g, percent_diff_ml_p_g = p_ml_from_g_pipeline(y1, y2, user_p=p)
 
     em_res = expectation_maximization_algorithm_ector(y1, x[2], p)
-    print("\n", em_res)
+    em_res_one_step = em_algorithm_ector_one_step(y1, x[2], p)
+    percent_diff_p_em = (em_res.p_k - em_res_one_step.p_k) / em_res.p_k * 100.0
+
+    print(f"Difference b/w solved p in full EM algo vs. one step: {percent_diff_p_em:.6f} %")
 
 
 if __name__ == "__main__":

@@ -207,6 +207,68 @@ def expectation_maximization_algorithm_ector(
     )
 
 
+def em_algorithm_ector_one_step(
+    y1: float | int,
+    x3: float | int,
+    p_0: float,
+    max_iters: int = 1000,
+    epsilon: float = 1e-6
+) -> EMResOneStep:
+    """
+    Using a warm-start p_0, find the values of p_k,
+    (x3 is already known, so don't compute it here), where k = 1, 2, ..., max_iters.
+    Repeat until max_iters is reached or the solver converges, whichever comes first
+
+    :param y1: number of total dark counts
+    :type y1: nonneg float or int
+    :param x3: number of total light counts
+    :type x3: nonneg float or int
+    :param p_0: warmstart guess for finding p_k
+    :type p_0: float
+    :param max_iters: (optional) maximum iterations
+    :type max_iters: int (default 1000)
+    :param epsilon: (optional) convergence quantifier
+    :type epsilon: float (default 1e-6)
+    :return: p_k, convergence status, p_0, histograms for x1, x2, and p, and solver time
+    :rtype: EMResOneStep
+    """
+    start_time = time.time()
+
+    p_history: dict[str, float] = {}
+    p_history["p_0"] = p_0
+
+    converged = False
+
+    iters = 1
+    while iters <= max_iters:
+        p = compute_p_k_plus_1(p_history[f"p_{iters - 1}"], y1, x3)
+
+        p_history[f"p_{iters}"] = p
+
+        if iters != 1:
+            prev_p = p_history[f"p_{iters - 1}"]
+
+            if convergence(p, prev_p, epsilon):
+                converged = True
+
+                return EMResOneStep(
+                    p_k=p, converged=converged, p_0=p_0,
+                    p_history=p_history, solver_time=time.time() - start_time
+                )
+            
+        iters += 1
+
+    last_p, second_to_last_p = get_final_two_values(p_history)
+
+    if convergence(p, second_to_last_p):
+        converged = True
+
+    return EMResOneStep(
+        p_k=last_p, converged=converged, p_0=p_0,
+        p_history=p_history, solver_time=time.time() - start_time
+    )
+
+
 def compute_p_k_plus_1(
     p_k: float,
     y1: float | int,

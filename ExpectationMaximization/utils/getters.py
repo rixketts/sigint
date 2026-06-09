@@ -7,7 +7,7 @@ T = TypeVar("T")
 
 
 def get_final_two_values(
-        items: Iterable[T] | dict[K, V]
+    items: Iterable[T] | dict[K, V]
 ) -> tuple[T | V, T | V]:
     """
     Return (final item, second to last item)
