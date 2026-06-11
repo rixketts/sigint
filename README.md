@@ -68,9 +68,42 @@ python ector_intro_script.py 25 38 37 0
 
 ---
 
+# ET Image Reconstruction
+Models emission tomography (ET) image reconstruction, where tissues emit photons detected by surrounding sensors. The body is divided into `B` boxes, each with a Poisson emission process with mean `λ(b)`. `D` detectors surrounding the body observe photon counts `y(d)`.
+Structure
+
+Box: owns emission rate `λ(b)`, randomly initialized via exponential distribution
+Detector: owns observed photon count `y(d)` and mean detection rate `λ(d)`
+Body: owns boxes, detectors, and detection probability matrix `p(b,d)` (num_boxes × num_detectors, rows sum to 1 per **Equation 14**)
+
+## Implemented Equations
+
+- **Equation (15)**: λ(b,d) = λ(b) · p(b,d)
+- **Poisson PMF: f(n|λ(b))**: photon generation process per box
+- **f(y|λ(d))**: Poisson PMF for detector counts (incomplete data likelihood)
+- **λ(d) computation**: mean photon count per detector from box emission rates
+
+---
+
+## Usage
+
+```
+python et_image_reconstruction_script.py num_boxes num_detectors
+```
+
+| Argument | Type | Description | 
+| -------- | ---- | ----------- | 
+| num_boxes | positive int | Number of boxes dividing the body |
+| num_detectors | positive int| Number of detectors surrounding the body |
+
+### Example
+python et_image_reconstruction_script.py 20 50
+Outputs a bar chart of Poisson PMF values overlaid with λ(d) across all detectors, saved as poisson_pmf.png.
+
+---
+
 ## Planned Extensions
 
-- ET (emission tomography) image reconstruction
 - Active noise cancellation (ANC)
 - Hidden Markov models (HMMs)
 - Spread-spectrum multi-user communication
@@ -82,3 +115,4 @@ python ector_intro_script.py 25 38 37 0
 - Python 3.10+
 - numpy
 - scipy
+- matplotlib
