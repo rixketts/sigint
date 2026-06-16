@@ -36,10 +36,15 @@ def et_image_reconstruction_pipeline(
 
     poisson_pmf = body.poisson_pmf_counts()
 
-    plot_poisson_pmf(
-        poisson_pmf, lambda_d,
-        PROJECT_ROOT / "plots"
-    )
+    # plot_poisson_pmf(
+    #     poisson_pmf, lambda_d,
+    #     PROJECT_ROOT / "plots"
+    # )
+
+    photon_map = body.poisson_photon_mapping()
+
+    test = body.compute_likelihood_function(photon_map)
+    print(test)
     
 
 def main() -> None:

@@ -80,3 +80,17 @@ class Body:
             )
 
         return poisson_pmf
+    
+
+    def poisson_photon_mapping(self) -> npt.NDArray[np.float64]:
+        """
+        Each variable of the complete data is Poisson with mean
+        lambda(b, d)
+        """
+        lambda_bd = np.empty(shape=self.p_bd.shape, dtype=np.float64)
+
+        for i, (box, p_b) in enumerate(zip(self.boxes, self.p_bd)):
+            lambda_bd[i] = box.lambda_b * p_b
+
+        return lambda_bd
+
