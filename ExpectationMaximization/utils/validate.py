@@ -1,4 +1,25 @@
 from typing import Any, Iterable
+import numpy as np
+import numpy.typing as npt
+
+from ETImageReconstruction.objs.box import Box
+
+
+def validate_photon_counts(
+    photon_counts: npt.NDArray[np.int64], boxes: list[Box]
+) -> None:
+    if len(photon_counts) != len(boxes):
+        raise ValueError(
+            f"Photon counts should reflect boxes, got {len(photon_counts)} instances for {len(boxes)} boxes"
+        )
+    
+    negative_counts = photon_counts[photon_counts < 0]
+
+    if len(negative_counts) != 0:
+        raise ValueError(
+            f"There should be no negative photon counts, got {negative_counts}"
+        )
+
 
 def validate_x_vector(x: tuple[Any, ...]) -> None:
     def _validate_x_dims() -> None:
